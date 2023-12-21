@@ -1,4 +1,4 @@
-from routes import app
+from resources import app
 
 
 if __name__ == '__main__':
