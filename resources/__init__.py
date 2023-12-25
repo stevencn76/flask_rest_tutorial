@@ -12,3 +12,4 @@ db = SQLAlchemy(app)
 from resources import student_resource
 from resources import book_resource
 from resources import user_resource
+from resources import attachment_resource
