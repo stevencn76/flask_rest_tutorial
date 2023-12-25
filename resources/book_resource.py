@@ -1,8 +1,11 @@
 from datetime import datetime
 
+import jwt
 from flask import request
 from flask_restful import Resource
 
+from common.api_tools import token_required
+from common.constants import LOGIN_SECRET
 from models.book_model import BookModel
 from resources import api
 from services.book_service import BookService
@@ -16,6 +19,7 @@ class BookResource(Resource):
         else:
             return {'error': f'Book not found for id: {book_id}'}, 404
 
+    @token_required()
     def put(self, book_id: int):
         try:
             request_json = request.json
@@ -40,6 +44,7 @@ class BookListResource(Resource):
         book_list = BookService().get_all_books()
         return [book_model.serialize() for book_model in book_list]
 
+    @token_required()
     def post(self):
         try:
             request_json = request.json
