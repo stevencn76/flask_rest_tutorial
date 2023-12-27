@@ -1,17 +1,17 @@
 from datetime import datetime
 
-import jwt
-from flask import request
+from flask import request, Response
+from flask_apispec import MethodResource, doc
 from flask_restful import Resource
 
 from common.api_tools import token_required
-from common.constants import LOGIN_SECRET
 from models.book_model import BookModel
-from resources import api
+from resources import app, api, docs
 from services.book_service import BookService
 
 
-class BookResource(Resource):
+class BookResource(MethodResource, Resource):
+    @doc(description="Get a book's information", tags=['Book Requests'])
     def get(self, book_id: int):
         book_model = BookService().get_book_by_id(book_id)
         if book_model:
@@ -19,6 +19,7 @@ class BookResource(Resource):
         else:
             return {'error': f'Book not found for id: {book_id}'}, 404
 
+    @doc(description="Update a book's information", tags=['Book Requests'])
     @token_required()
     def put(self, book_id: int):
         try:
@@ -65,3 +66,12 @@ class BookListResource(Resource):
 
 api.add_resource(BookResource, '/books/<int:book_id>')
 api.add_resource(BookListResource, '/books')
+
+docs.register(BookResource)
+
+
+@app.route('/swagger.yaml')
+def generate_swagger_yaml():
+    yaml_doc = docs.spec.to_yaml()
+    return Response(yaml_doc, mimetype="text/yaml")
+
